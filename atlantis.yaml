@@ -1,0 +1,31 @@
+version: 3
+
+projects:
+- name: app-stack-dev
+  dir: stack/app
+  workflow: dev
+  autoplan:
+    when_modified: ["../modules/**/*.tf", "*.tf*"]
+- name: app-stack-prod
+  dir: stack/app
+  workflow: prod
+  autoplan:
+    when_modified: ["../modules/**/*.tf", "*.tf*"]
+
+workflows:
+  dev:
+    plan:
+      steps:
+      - run: rm -rf .terraform
+      - init:
+          extra_args: [-backend-config=env/dev/dev.backend.tfvars]
+      - plan:
+          extra_args: ["-var-file", "env/dev/dev.tfvars"]
+  prod:
+    plan:
+      steps:
+      - run: rm -rf .terraform
+      - init:
+          extra_args: [-backend-config=env/dev/dev.backend.tfvars]
+      - plan:
+          extra_args: ["-var-file", "env/prod/prod.tfvars"]
